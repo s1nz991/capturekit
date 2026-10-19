@@ -1,8 +1,8 @@
 """Paths and settings.
 
-Everything lives under PUBLIKCLIP_HOME (default ~/.publikclip):
+Everything lives under capturekit_HOME (default ~/.capturekit):
 
-    ~/.publikclip/
+    ~/.capturekit/
       db.sqlite3          job + stage bookkeeping
       bin/                managed binaries (yt-dlp)
       models/             downloaded model weights
@@ -10,8 +10,8 @@ Everything lives under PUBLIKCLIP_HOME (default ~/.publikclip):
       secrets.json        keys (0600): publik API block, own Gemini key, Pexels
       publik-status.json  publik API balance line, written after every call
 
-The desktop shell and the CLI both use the same resolution (PUBLIKCLIP_HOME,
-else ~/.publikclip), so secrets.json written by onboarding is what the
+The desktop shell and the CLI both use the same resolution (capturekit_HOME,
+else ~/.capturekit), so secrets.json written by onboarding is what the
 pipeline reads. Artifacts on disk are the source of truth — the DB only records
 what should exist so a stage can decide whether to skip itself on resume.
 """
@@ -25,7 +25,7 @@ from pathlib import Path
 
 
 def home_dir() -> Path:
-    return Path(os.environ.get("PUBLIKCLIP_HOME", str(Path.home() / ".publikclip")))
+    return Path(os.environ.get("capturekit_HOME", str(Path.home() / ".capturekit")))
 
 
 def jobs_dir() -> Path:
@@ -57,7 +57,7 @@ def publik_shared_file() -> Path:
         base = Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / "publik" / "apps"
     else:
         base = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "publik" / "apps"
-    return base / "publikclip.json"
+    return base / "capturekit.json"
 
 
 def ensure_home() -> Path:

@@ -1,5 +1,5 @@
 # Different-angle repro attempt: NOT a synthetic "skip step 4" control this
-# time. Runs the publikclip Windows guide's real steps 4-11 VERBATIM, in one
+# time. Runs the capturekit Windows guide's real steps 4-11 VERBATIM, in one
 # persistent session, exactly as the sensitivity check's sibling primary run
 # did -- except the session's PATH has the winget.exe host directory removed
 # BEFORE step 4, simulating a real population subset: Windows machines where
@@ -44,27 +44,27 @@ Write-Host '--- step 4: Install uv (real guide command, winget dir stripped from
 winget install --id astral-sh.uv -e --accept-source-agreements --accept-package-agreements
 Write-Host "STEP 4 EXIT: $LASTEXITCODE"
 
-Write-Host '--- step 5: Copy publikclip to this PC'
+Write-Host '--- step 5: Copy capturekit to this PC'
 Set-Location $HOME
-if (-not (Test-Path publikclip/.git)) {
-  git clone https://github.com/Blueturboguy07/publikclip.git
+if (-not (Test-Path capturekit/.git)) {
+  git clone https://github.com/Blueturboguy07/capturekit.git
 }
 Write-Host "STEP 5 EXIT: $LASTEXITCODE"
 
-Write-Host '--- step 6: Open the publikclip folder'
-Set-Location (Join-Path $HOME 'publikclip')
+Write-Host '--- step 6: Open the capturekit folder'
+Set-Location (Join-Path $HOME 'capturekit')
 
 Write-Host '--- step 7: Use the reviewed version'
 git checkout e8e0d6dc0cfc1bd3d1e8184b630c7fc95569d543
 Write-Host "STEP 7 EXIT: $LASTEXITCODE"
 
 Write-Host '--- step 8: Install the interface packages'
-Set-Location (Join-Path $HOME 'publikclip/app')
+Set-Location (Join-Path $HOME 'capturekit/app')
 npm.cmd install
 Write-Host "STEP 8 EXIT: $LASTEXITCODE"
 
 Write-Host '--- step 9: Build the installer'
-Set-Location (Join-Path $HOME 'publikclip/app')
+Set-Location (Join-Path $HOME 'capturekit/app')
 $env:Path = "$env:USERPROFILE\.cargo\bin;$env:LOCALAPPDATA\Microsoft\WinGet\Links;$env:Path"
 Write-Host "where.exe uv (before build): $(where.exe uv 2>&1)"
 node_modules\.bin\tauri.cmd build --bundles nsis 2>&1 | ForEach-Object { Write-Host $_ }
@@ -73,7 +73,7 @@ Write-Host "BUILD STEP EXIT CODE: $buildExit"
 if ($buildExit -ne 0) { $present = $true }
 
 Write-Host '--- step 10: Run the installer'
-Set-Location (Join-Path $HOME 'publikclip/app')
+Set-Location (Join-Path $HOME 'capturekit/app')
 $setup = Get-ChildItem src-tauri\target\release\bundle\nsis -Filter *-setup.exe -ErrorAction SilentlyContinue | Select-Object -First 1
 if (-not $setup) {
   Write-Host "Get-ChildItem : Cannot find path '$((Join-Path (Get-Location) 'src-tauri\target\release\bundle\nsis'))' because it does not exist."
@@ -84,10 +84,10 @@ if (-not $setup) {
   Write-Host "STEP 10 EXIT: $($installer.ExitCode)"
 }
 
-Write-Host '--- step 11: Open publikclip'
-Set-Location (Join-Path $HOME 'publikclip/app')
+Write-Host '--- step 11: Open capturekit'
+Set-Location (Join-Path $HOME 'capturekit/app')
 try {
-  Start-Process "$env:LOCALAPPDATA\publikclip\publikclip-app.exe" -ErrorAction Stop
+  Start-Process "$env:LOCALAPPDATA\capturekit\capturekit-app.exe" -ErrorAction Stop
   Write-Host "STEP 11: launched"
 } catch {
   Write-Host "Start-Process : This command cannot be run due to the error: The system cannot find the file specified."

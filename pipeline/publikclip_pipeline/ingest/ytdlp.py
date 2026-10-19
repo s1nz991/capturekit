@@ -2,7 +2,7 @@
 
 Ported from JeremySNR/clip-forge src/main/pipeline/ytdlp.ts (MIT — see
 VENDORED-LICENSES.md): the standalone binary (not the pip package) is
-downloaded to PUBLIKCLIP_HOME/bin on first use so the built-in self-updater
+downloaded to capturekit_HOME/bin on first use so the built-in self-updater
 keeps working — sites change their players constantly and a stale yt-dlp is
 the most common cause of extractor failures. On any yt-dlp failure we run
 `-U` once per process and retry once (withSelfUpdateRetry pattern).
@@ -244,7 +244,7 @@ _PCT_RE = re.compile(r"\[download\]\s+([\d.]+)%")
 
 def download(url: str, out_path: Path, progress: ProgressFn) -> None:
     bin_path = ensure_ytdlp(progress)
-    # The ffmpeg publikclip resolved, not whatever a login shell's PATH holds:
+    # The ffmpeg capturekit resolved, not whatever a login shell's PATH holds:
     # a desktop launch has neither Homebrew nor the fetched static build on it.
     ffmpeg = ffmpeg_bin.ffmpeg()
     if not os.path.isabs(ffmpeg):

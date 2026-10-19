@@ -1349,7 +1349,7 @@ wheels = [
 ]
 
 [[package]]
-name = "publikclip-pipeline"
+name = "capturekit-pipeline"
 version = "0.2.6"
 source = { editable = "." }
 

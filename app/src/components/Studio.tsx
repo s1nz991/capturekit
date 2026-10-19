@@ -166,7 +166,7 @@ export default function Studio({ jobs, running, stages, error, onRun, onOpenLoop
         <section className="publik-banner update-banner">
           <span className="led led-half" />
           <div>
-            <strong>publikclip {update.latest} is out.</strong> You have {update.current}.
+            <strong>capturekit {update.latest} is out.</strong> You have {update.current}.
             <div className="publik-actions">
               <button className="btn-secondary" onClick={() => openUrl(update.url)}>
                 Download
@@ -188,7 +188,7 @@ export default function Studio({ jobs, running, stages, error, onRun, onOpenLoop
       )}
       <aside className="rail">
         <header className="rail-brand">
-          <span className="rail-logo">publikclip</span>
+          <span className="rail-logo">capturekit</span>
           <span className="rail-sub">the clipper that shows its work</span>
         </header>
         <div className="rail-jobs">

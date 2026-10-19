@@ -1,6 +1,6 @@
 # Vendored code provenance
 
-publikclip is AGPL-3.0-or-later. It adapts code, models, and fonts from the
+capturekit is AGPL-3.0-or-later. It adapts code, models, and fonts from the
 following projects. Vendored files carry an attribution header pointing back
 here. "Adapted" = algorithm/constants faithfully ported into our structures;
 "Vendored" = file taken near-verbatim.

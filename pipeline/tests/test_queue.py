@@ -8,13 +8,13 @@ import json
 
 import pytest
 
-from publikclip_pipeline import config
-from publikclip_pipeline.jobs import queue
+from capturekit_pipeline import config
+from capturekit_pipeline.jobs import queue
 
 
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("capturekit_HOME", str(tmp_path / "home"))
     yield
 
 

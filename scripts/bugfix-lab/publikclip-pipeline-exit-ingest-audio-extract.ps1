@@ -1,5 +1,5 @@
 # bugfix-lab controlled-environment repro (Windows) for cluster:
-# publikclip-pipeline-exit-ingest-audio-extract
+# capturekit-pipeline-exit-ingest-audio-extract
 #
 # Symptom (report 06a321e2, Windows): the INGEST row reads "Extracting
 # analysis audio…" — i.e. AFTER download/probe already show done/cached —
@@ -8,7 +8,7 @@
 # banner. The reporter also says no Resume button is visible on screen.
 #
 # Mechanism under test (real, unmodified pipeline source):
-# pipeline/publikclip_pipeline/ingest/stage.py's IngestStage.run() calls
+# pipeline/capturekit_pipeline/ingest/stage.py's IngestStage.run() calls
 # normalize.extract_analysis_audio() UNWRAPPED — contrast the
 # normalize.probe() call 8 lines above it in the same function, which IS
 # wrapped (`except normalize.FfmpegError as err: raise StageError(...) from
@@ -71,10 +71,10 @@ uv venv --python 3.12 .venv-oracle
 uv pip install --python .venv-oracle\Scripts\python.exe httpx
 Pop-Location
 
-$homeDir = Join-Path $env:RUNNER_TEMP "publikclip_home"
+$homeDir = Join-Path $env:RUNNER_TEMP "capturekit_home"
 New-Item -ItemType Directory -Force -Path $homeDir | Out-Null
-$env:PUBLIKCLIP_HOME = $homeDir
-$env:PUBLIKCLIP_PIPELINE_DIR = (Resolve-Path "pipeline").Path
+$env:capturekit_HOME = $homeDir
+$env:capturekit_PIPELINE_DIR = (Resolve-Path "pipeline").Path
 
 $fixture = (Resolve-Path "scripts\bugfix-lab\fixtures\ingest-audio-extract-fail.mp4").Path
 Write-Host ""
@@ -94,7 +94,7 @@ $stdoutLog = Join-Path $env:RUNNER_TEMP "oracle_out.json"
 $harnessCode = $LASTEXITCODE
 
 Write-Host ""
-Write-Host "=== publikclip cli.main(['--jsonl','run', '$fixture']) via oracle_drive.py ==="
+Write-Host "=== capturekit cli.main(['--jsonl','run', '$fixture']) via oracle_drive.py ==="
 Write-Host "harness exit code: $harnessCode"
 
 if ($harnessCode -ne 0 -or -not (Test-Path $stdoutLog) -or (Get-Item $stdoutLog).Length -eq 0) {

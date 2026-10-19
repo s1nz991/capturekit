@@ -3,7 +3,7 @@
 // through the system curl — the same precedent as check_ollama, and the only
 // HTTP this shell does. The pipeline's own venv does not exist yet at
 // onboarding time (it bootstraps on the first run), so this cannot be a
-// sidecar call. The key lands in ~/.publikclip/secrets.json (0600) next to the
+// sidecar call. The key lands in ~/.capturekit/secrets.json (0600) next to the
 // own-key fields; the pipeline reads it from there.
 use std::fs;
 use std::io::Write;
@@ -16,7 +16,7 @@ use crate::{home_dir, quiet_command};
 
 const PUBLIK_API: &str = "https://publikhq.com/api/v1";
 // Public by design: it only authorises minting one capped key attributed to
-// publikclip, which is what the app itself does — and every user builds this
+// capturekit, which is what the app itself does — and every user builds this
 // app from source, so it has to live in the repo. Rotated by committing a new
 // file; overridable at build time (PUBLIK_APP_TOKEN) for a CI-cut build.
 const APP_TOKEN: &str = match option_env!("PUBLIK_APP_TOKEN") {
@@ -159,7 +159,7 @@ fn os_slug() -> &'static str {
 fn mint_body(install_id: &str) -> Value {
     json!({
         "app_token": APP_TOKEN.trim(),
-        "app_slug": "publikclip",
+        "app_slug": "capturekit",
         "app_version": env!("CARGO_PKG_VERSION"),
         "os": os_slug(),
         "device_name": device_name(),
@@ -283,7 +283,7 @@ pub(crate) fn block_from_wallet(block: &Value, wallet: &Value) -> Value {
     next
 }
 
-/// Founder rule (2026-09-28): publikclip runs only on a computer whose
+/// Founder rule (2026-09-28): capturekit runs only on a computer whose
 /// publik API install is linked to a publik account, whichever brain scores.
 /// `status` is publik_status()'s shape.
 pub(crate) fn is_linked(status: &Value) -> bool {
@@ -293,7 +293,7 @@ pub(crate) fn is_linked(status: &Value) -> bool {
 }
 
 pub(crate) const LINK_REQUIRED: &str =
-    "Link your publik account to start. publikclip runs on a linked publik account.";
+    "Link your publik account to start. capturekit runs on a linked publik account.";
 
 /// The backstop behind the Studio's link card: run_job and resume_job refuse
 /// to start on an unlinked computer. Reads the files publik_refresh keeps
@@ -510,7 +510,7 @@ mod tests {
 
     #[test]
     fn app_token_is_embedded() {
-        assert!(APP_TOKEN.trim().starts_with("pat_publikclip_"));
+        assert!(APP_TOKEN.trim().starts_with("pat_capturekit_"));
     }
 
     #[test]
@@ -560,7 +560,7 @@ mod tests {
     #[test]
     fn mint_body_shape() {
         let b = mint_body("iid");
-        assert_eq!(b["app_slug"], "publikclip");
+        assert_eq!(b["app_slug"], "capturekit");
         assert_eq!(b["disclosure_version"], 1);
         assert_eq!(b["dialects"], json!(["gemini"]));
         assert_eq!(b["app_version"], env!("CARGO_PKG_VERSION"));
@@ -569,7 +569,7 @@ mod tests {
 
     #[test]
     fn write_secrets_keeps_other_keys_and_is_0600() {
-        let dir = std::env::temp_dir().join(format!("publikclip-test-{}", new_install_id()));
+        let dir = std::env::temp_dir().join(format!("capturekit-test-{}", new_install_id()));
         let path = dir.join("secrets.json");
         write_secrets_at(&path, &json!({"gemini_api_key": "AIza", "pexels_api_key": "px"})).unwrap();
         let mut current = read_json(&path);

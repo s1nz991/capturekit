@@ -1,6 +1,6 @@
-"""Oracle driver for cluster publikclip-pipeline-exit-ingest-audio-extract.
+"""Oracle driver for cluster capturekit-pipeline-exit-ingest-audio-extract.
 
-Drives the REAL publikclip_pipeline CLI code path (cli.main -> cmd_run ->
+Drives the REAL capturekit_pipeline CLI code path (cli.main -> cmd_run ->
 _execute -> queue.run_stages -> IngestStage.run -> normalize.probe() ->
 normalize.extract_analysis_audio()) against a real LOCAL FILE job (no
 network needed — matches the "download/probe already succeeded" framing
@@ -32,7 +32,7 @@ The only thing swapped out from the real code is cli._stages(): the real
 function imports all 8 stages (asr/diarize/.../render), which pulls in
 torch/whisperx/speechbrain/opencv/etc. This oracle patches it to return
 only IngestStage(), exactly as the sibling
-publikclip-pipeline-exit-ingest-ytdlp oracle does, and for the same
+capturekit-pipeline-exit-ingest-ytdlp oracle does, and for the same
 reason: ingest is stage 1 and this repro never gets past it either way
 (FfmpegError from extract_analysis_audio() is not a queue.StageError, so
 per ingest/stage.py it propagates unwrapped straight out of
@@ -66,11 +66,11 @@ import sys
 import traceback
 from contextlib import redirect_stdout, redirect_stderr
 
-pipeline_dir = os.environ.get("PUBLIKCLIP_PIPELINE_DIR") or os.path.dirname(os.path.abspath(__file__))
+pipeline_dir = os.environ.get("capturekit_PIPELINE_DIR") or os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, pipeline_dir)
 
-from publikclip_pipeline import cli  # noqa: E402
-from publikclip_pipeline.ingest.stage import IngestStage  # noqa: E402
+from capturekit_pipeline import cli  # noqa: E402
+from capturekit_pipeline.ingest.stage import IngestStage  # noqa: E402
 
 # The one intentional patch: avoid importing asr/diarize/candidates/score/
 # camera/render (torch, whisperx, speechbrain, opencv, ...) since ingest is

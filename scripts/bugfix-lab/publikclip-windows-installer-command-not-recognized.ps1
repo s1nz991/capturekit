@@ -1,9 +1,9 @@
 <#
-  Oracle for cluster: publikclip-windows-installer-command-not-recognized
+  Oracle for cluster: capturekit-windows-installer-command-not-recognized
 
-  What the reporter did: followed publikclip's Windows guide (the only rendered
+  What the reporter did: followed capturekit's Windows guide (the only rendered
   path today for someone without desktop Iris is GuideArticle.tsx, served at
-  /publikclip/install/windows — confirmed by reading
+  /capturekit/install/windows — confirmed by reading
   components/iris/GuideArticle.tsx in the publik repo, which says explicitly:
   "This is what's left for a crawler or a reader without JavaScript, or
   without Iris"). Every step's instruction is pure advisory text
@@ -22,7 +22,7 @@
   "'$setup' is not recognized ... 'Start-Process' is not recognized ...".
 
   Tests two versions of the command text:
-    - CURRENT: lib/guides/publikclip.ts on today's publik default branch
+    - CURRENT: lib/guides/capturekit.ts on today's publik default branch
       (guide version 7, as rendered by render-guide.mts on 2026-09-21).
     - HISTORICAL: the exact text live on 2026-08-13/14 (publik commit
       6813bf7, guide version 2) -- what this report's author actually had,
@@ -36,7 +36,7 @@
 #>
 
 $ErrorActionPreference = "Stop"
-$work = Join-Path $env:RUNNER_TEMP "publikclip-installer-oracle"
+$work = Join-Path $env:RUNNER_TEMP "capturekit-installer-oracle"
 New-Item -ItemType Directory -Force -Path $work | Out-Null
 
 function Run-InCmd {
@@ -77,7 +77,7 @@ function Run-InCmd {
 }
 
 # --- CURRENT: publik default branch, 2026-09-21, guide version 7 ---
-# Rendered via: cd $WORK/publik && npx tsx bin/render-guide.mts publikclip windows --json
+# Rendered via: cd $WORK/publik && npx tsx bin/render-guide.mts capturekit windows --json
 # step id "install-app", command field, verbatim.
 $currentCommand = @'
 $setup = Get-ChildItem src-tauri\target\release\bundle\nsis -Filter *-setup.exe | Select-Object -First 1
@@ -87,7 +87,7 @@ $installer.WaitForExit()
 
 # --- HISTORICAL: publik commit 6813bf7 (landed 2026-08-13, live through
 # 2026-09-18's 66c5fd0), guide version 2 -- what the 2026-08-14 reporter had.
-# Retrieved via: git show 6813bf7:lib/guides/publikclip.ts
+# Retrieved via: git show 6813bf7:lib/guides/capturekit.ts
 $historicalCommand = @'
 $setup = Get-ChildItem src-tauri\target\release\bundle\nsis -Filter *-setup.exe | Select-Object -First 1
 Start-Process -FilePath $setup.FullName -Wait

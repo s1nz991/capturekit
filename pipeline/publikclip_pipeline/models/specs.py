@@ -1,7 +1,7 @@
 """Concrete model registry entries.
 
 Whisper weights are managed by faster-whisper's HuggingFace cache (pointed
-at PUBLIKCLIP_HOME/models/hf via HF_HOME in the ASR stage); everything else
+at capturekit_HOME/models/hf via HF_HOME in the ASR stage); everything else
 is fetched explicitly through the registry so the app can show one honest
 download progress list. All entries are ungated — no tokens, no accounts
 (the CAM++ Apache-2.0 verification is what made that possible).

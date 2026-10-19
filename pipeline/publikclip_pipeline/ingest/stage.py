@@ -54,7 +54,7 @@ class IngestStage(Stage):
         ffmpeg_bin.ensure_capable(progress=prog)
         if not ffmpeg_bin.available():
             raise StageError(
-                "publikclip needs ffmpeg and could not find or download one. "
+                "capturekit needs ffmpeg and could not find or download one. "
                 "Check your internet connection and try again."
             )
 
@@ -80,7 +80,7 @@ class IngestStage(Stage):
             raise StageError(str(err)) from err
         if not info.has_audio:
             raise StageError(
-                "This video has no audio track. publikclip needs speech to find moments."
+                "This video has no audio track. capturekit needs speech to find moments."
             )
 
         if info.vfr:

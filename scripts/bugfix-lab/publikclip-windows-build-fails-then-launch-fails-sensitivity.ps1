@@ -8,12 +8,12 @@ $present = $false
 
 Write-Host '--- (sensitivity) deliberately SKIPPING uv install ---'
 Set-Location $HOME
-if (-not (Test-Path publikclip/.git)) {
-  git clone https://github.com/Blueturboguy07/publikclip.git
+if (-not (Test-Path capturekit/.git)) {
+  git clone https://github.com/Blueturboguy07/capturekit.git
 }
-Set-Location (Join-Path $HOME 'publikclip')
+Set-Location (Join-Path $HOME 'capturekit')
 git checkout a53a359b985b1d2d666266062936cc186f02340b 2>&1 | Out-Null
-Set-Location (Join-Path $HOME 'publikclip/app')
+Set-Location (Join-Path $HOME 'capturekit/app')
 npm.cmd install 2>&1 | Out-Null
 Write-Host "npm install exit code: $LASTEXITCODE"
 

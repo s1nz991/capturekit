@@ -10,9 +10,9 @@ generateContent); they differ in where the call goes, whose key rides the
 x-goog-api-key header, and who is billed. That difference is an Endpoint.
 
 Key resolution, publik mode: PUBLIK_API_KEY env var (+ PUBLIK_API_BASE_URL),
-then PUBLIKCLIP_HOME/secrets.json {"publik": {...}} (written by the app's
+then capturekit_HOME/secrets.json {"publik": {...}} (written by the app's
 onboarding), then the shared per-app file publik's convention names.
-Gemini mode: PUBLIKCLIP_GEMINI_API_KEY env var, then secrets.json
+Gemini mode: capturekit_GEMINI_API_KEY env var, then secrets.json
 {"gemini_api_key": "..."}. Ollama needs no key — just a running daemon.
 """
 
@@ -138,7 +138,7 @@ def _secrets() -> dict:
 
 
 def gemini_api_key() -> str | None:
-    key = os.environ.get("PUBLIKCLIP_GEMINI_API_KEY")
+    key = os.environ.get("capturekit_GEMINI_API_KEY")
     if key:
         return key
     return _secrets().get("gemini_api_key") or None
@@ -191,11 +191,11 @@ def resolve_endpoint(llm_mode: str) -> Endpoint:
     if not key:
         raise LlmError(
             "No Gemini API key found. Add one in Settings (or set "
-            "PUBLIKCLIP_GEMINI_API_KEY), or switch to publik API or Ollama mode."
+            "capturekit_GEMINI_API_KEY), or switch to publik API or Ollama mode."
         )
     return Endpoint(
         "gemini",
-        os.environ.get("PUBLIKCLIP_GEMINI_BASE_URL") or GEMINI_BASE_URL,
+        os.environ.get("capturekit_GEMINI_BASE_URL") or GEMINI_BASE_URL,
         key.strip(),
         GEMINI_MODEL,
         GEMINI_IMAGE_MODEL,
@@ -548,7 +548,7 @@ class GeminiClient:
             soonest = min((h.retry_after for h in self._day_out.values() if h.retry_after), default=None)
             when = f", {_in_about(soonest)}" if soonest else ""
             raise QuotaExhaustedError(
-                "Your Gemini key has used today's free requests on every model publikclip "
+                "Your Gemini key has used today's free requests on every model capturekit "
                 f"can use ({used}). Google resets daily quotas at midnight Pacific time{when}. "
                 "Resume the job then: the moments already scored are saved and are not sent "
                 "again. Or switch the brain to publik API in Settings."

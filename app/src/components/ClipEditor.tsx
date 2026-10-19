@@ -424,7 +424,7 @@ export default function ClipEditor({ jobId, clipIndex, onClose, onRendered }: Pr
     e.preventDefault()
     setAudioDropHover(false)
     if (!edit) return
-    const raw = e.dataTransfer.getData('application/x-publikclip-audio')
+    const raw = e.dataTransfer.getData('application/x-capturekit-audio')
     if (!raw) return
     let lib: LibraryItem
     try {

@@ -1,6 +1,6 @@
-"""bugfix-lab Windows-CI driver for cluster publikclip-pipeline-exit-speakers-model.
+"""bugfix-lab Windows-CI driver for cluster capturekit-pipeline-exit-speakers-model.
 
-Same mechanism as bugfix-lab/work/publikclip-pipeline-exit-speakers-model/
+Same mechanism as bugfix-lab/work/capturekit-pipeline-exit-speakers-model/
 oracle_drive.py (mac-local oracle) -- this is the Windows-runner copy so the
 GitHub Actions workflow can exercise the real, unmodified
 diarize/stage.py -> models/registry.py -> diarize/campplus.py torch.load()
@@ -22,16 +22,16 @@ import traceback
 from contextlib import redirect_stdout, redirect_stderr
 from pathlib import Path
 
-pipeline_dir = os.environ.get("PUBLIKCLIP_PIPELINE_DIR") or os.path.dirname(os.path.abspath(__file__))
+pipeline_dir = os.environ.get("capturekit_PIPELINE_DIR") or os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, pipeline_dir)
 
-from publikclip_pipeline import cli, config  # noqa: E402
-from publikclip_pipeline.asr.stage import AsrStage  # noqa: E402
-from publikclip_pipeline.diarize.stage import DiarizeStage  # noqa: E402
-from publikclip_pipeline.ingest.stage import IngestStage  # noqa: E402
-from publikclip_pipeline.jobs import queue  # noqa: E402
-from publikclip_pipeline.models import specs  # noqa: E402
-from publikclip_pipeline.models.registry import model_path  # noqa: E402
+from capturekit_pipeline import cli, config  # noqa: E402
+from capturekit_pipeline.asr.stage import AsrStage  # noqa: E402
+from capturekit_pipeline.diarize.stage import DiarizeStage  # noqa: E402
+from capturekit_pipeline.ingest.stage import IngestStage  # noqa: E402
+from capturekit_pipeline.jobs import queue  # noqa: E402
+from capturekit_pipeline.models import specs  # noqa: E402
+from capturekit_pipeline.models.registry import model_path  # noqa: E402
 
 cli._stages = lambda: [IngestStage(), AsrStage(), DiarizeStage()]
 

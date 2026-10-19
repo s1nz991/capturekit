@@ -89,7 +89,7 @@ export function linkGate(p: PublikStatus | null): LinkGate {
 
 export const LINK_GATE_TITLE = 'Link your publik account to start'
 export const LINK_GATE_BODY =
-  'publikclip runs on a linked publik account. Linking gives $0.05 of free use, once.'
+  'capturekit runs on a linked publik account. Linking gives $0.05 of free use, once.'
 export const LINK_STILL_REQUIRED = 'A linked publik account is still required.'
 
 /**

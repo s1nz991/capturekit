@@ -234,7 +234,7 @@ export default function AudioPanel({ onClose, onLibraryChanged }: Props) {
                   draggable
                   title="drag onto the audio track"
                   onDragStart={(e) => {
-                    e.dataTransfer.setData('application/x-publikclip-audio', JSON.stringify(it))
+                    e.dataTransfer.setData('application/x-capturekit-audio', JSON.stringify(it))
                     e.dataTransfer.effectAllowed = 'copy'
                   }}
                 >

@@ -11,9 +11,9 @@ from pathlib import Path
 import httpx
 import pytest
 
-from publikclip_pipeline import cli, config
-from publikclip_pipeline.edits import visuals
-from publikclip_pipeline.scoring import llm as llm_mod
+from capturekit_pipeline import cli, config
+from capturekit_pipeline.edits import visuals
+from capturekit_pipeline.scoring import llm as llm_mod
 
 REPO = Path(__file__).resolve().parents[2]
 SCHEMA = {"type": "object", "properties": {"ok": {"type": "boolean"}}}
@@ -21,11 +21,11 @@ SCHEMA = {"type": "object", "properties": {"ok": {"type": "boolean"}}}
 
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_HOME", str(tmp_path / "home"))
-    for var in ("PUBLIK_API_KEY", "PUBLIK_API_BASE_URL", "PUBLIKCLIP_GEMINI_API_KEY", "PUBLIKCLIP_GEMINI_BASE_URL"):
+    monkeypatch.setenv("capturekit_HOME", str(tmp_path / "home"))
+    for var in ("PUBLIK_API_KEY", "PUBLIK_API_BASE_URL", "capturekit_GEMINI_API_KEY", "capturekit_GEMINI_BASE_URL"):
         monkeypatch.delenv(var, raising=False)
     # the real per-app convention file on a dev machine must never leak in
-    monkeypatch.setattr(config, "publik_shared_file", lambda: tmp_path / "shared" / "publikclip.json")
+    monkeypatch.setattr(config, "publik_shared_file", lambda: tmp_path / "shared" / "capturekit.json")
     monkeypatch.setattr(llm_mod.time, "sleep", lambda s: None)
     config.ensure_home()
     yield
@@ -136,7 +136,7 @@ def test_disconnected_block_is_not_a_credential():
 
 def test_gemini_mode_untouched(monkeypatch):
     _write_secrets({"publik": {"key": "pk_live_a"}})
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     ep = llm_mod.resolve_endpoint("gemini")
     assert ep.provider == "gemini"
     assert ep.key == "AIzaTEST"
@@ -144,7 +144,7 @@ def test_gemini_mode_untouched(monkeypatch):
     assert ep.url() == (
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
     )
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_BASE_URL", "http://proxy.test")
+    monkeypatch.setenv("capturekit_GEMINI_BASE_URL", "http://proxy.test")
     assert llm_mod.resolve_endpoint("gemini").url().startswith("http://proxy.test/v1beta/models/gemini-flash-latest")
 
 
@@ -171,7 +171,7 @@ def test_header_transport_no_query_param(monkeypatch):
     for refused in ("systemInstruction", "tools", "toolConfig", "cachedContent", "safetySettings"):
         assert refused not in call["json"]
 
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     calls = _capture(monkeypatch, [_ok_text()])
     llm_mod.make_client("gemini").generate_json("p", SCHEMA)
     assert calls[0]["headers"] == {"x-goog-api-key": "AIzaTEST"}
@@ -293,7 +293,7 @@ def test_publik_does_not_retry(monkeypatch):
 
 
 def test_gemini_mode_still_retries_three_times(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     calls = _capture(monkeypatch, [httpx.ReadTimeout("slow")])
     with pytest.raises(llm_mod.LlmError):
         llm_mod.make_client("gemini").generate_json("p", SCHEMA)
@@ -375,8 +375,8 @@ def test_scoring_stage_turns_publik_stop_into_stage_error(monkeypatch, tmp_path)
     {"ok": false, "error": …} with the link), not crash the sidecar."""
     from types import SimpleNamespace
 
-    from publikclip_pipeline.jobs.queue import StageError
-    from publikclip_pipeline.scoring.stage import ScoreStage
+    from capturekit_pipeline.jobs.queue import StageError
+    from capturekit_pipeline.scoring.stage import ScoreStage
 
     _write_secrets({"publik": {"key": "pk_live_a"}})
     res, top_up = _402("anonymous")
@@ -406,7 +406,7 @@ def test_scoring_stage_turns_publik_stop_into_stage_error(monkeypatch, tmp_path)
 
 def test_copy_rule():
     banned = re.compile(r"OpenAI API|ChatGPT credit|Gemini credit|publik credits|in credits", re.I)
-    roots = [REPO / "pipeline" / "publikclip_pipeline", REPO / "app" / "src", REPO / "README.md"]
+    roots = [REPO / "pipeline" / "capturekit_pipeline", REPO / "app" / "src", REPO / "README.md"]
     hits = []
     for root in roots:
         files = [root] if root.is_file() else [p for p in root.rglob("*") if p.suffix in {".py", ".ts", ".tsx", ".md"}]
@@ -438,7 +438,7 @@ def _model_of(call):
 
 
 def test_gemini_503_three_times_moves_to_the_lite_model(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     calls = _capture(monkeypatch, [_overloaded(), _overloaded(), _overloaded(), _ok_text()])
     client = llm_mod.make_client("gemini")
     assert client.generate_json("p", SCHEMA) == {"ok": True}
@@ -452,14 +452,14 @@ def test_gemini_503_three_times_moves_to_the_lite_model(monkeypatch):
 
 
 def test_gemini_404_skips_the_model_without_retrying(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     calls = _capture(monkeypatch, [_retired(), _ok_text()])
     assert llm_mod.make_client("gemini").generate_json("p", SCHEMA) == {"ok": True}
     assert [_model_of(c) for c in calls] == ["gemini-flash-latest", "gemini-flash-lite-latest"]
 
 
 def test_gemini_switched_model_sticks_for_the_rest_of_the_run(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     _capture(monkeypatch, [_overloaded(), _overloaded(), _overloaded(), _ok_text()])
     client = llm_mod.make_client("gemini")
     client.generate_json("moment 1", SCHEMA)
@@ -469,7 +469,7 @@ def test_gemini_switched_model_sticks_for_the_rest_of_the_run(monkeypatch):
 
 
 def test_gemini_switch_is_reported_to_the_progress_panel(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     _capture(monkeypatch, [_overloaded(), _overloaded(), _overloaded(), _ok_text()])
     notes = []
     llm_mod.make_client("gemini", notify=notes.append).generate_json("p", SCHEMA)
@@ -479,7 +479,7 @@ def test_gemini_switch_is_reported_to_the_progress_panel(monkeypatch):
 
 
 def test_gemini_every_model_overloaded_is_one_human_line(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     calls = _capture(monkeypatch, [_overloaded()])
     with pytest.raises(llm_mod.LlmError) as exc:
         llm_mod.make_client("gemini").generate_json("p", SCHEMA)
@@ -543,7 +543,7 @@ def _sleeps(monkeypatch):
 
 
 def test_gemini_per_minute_429_waits_what_google_asked_and_keeps_the_model(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     slept = _sleeps(monkeypatch)
     calls = _capture(monkeypatch, [_quota_429("minute", 5, "15s"), _ok_text()])
     notes = []
@@ -557,7 +557,7 @@ def test_gemini_per_minute_429_waits_what_google_asked_and_keeps_the_model(monke
 
 def test_gemini_standard_quota_text_is_not_a_billing_stop(monkeypatch):
     """The regression: "billing details" in Google's own wording."""
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     _sleeps(monkeypatch)
     calls = _capture(monkeypatch, [_quota_429("minute", 5, "15s", details=False), _ok_text()])
     assert llm_mod.make_client("gemini").generate_json("p", SCHEMA) == {"ok": True}
@@ -565,7 +565,7 @@ def test_gemini_standard_quota_text_is_not_a_billing_stop(monkeypatch):
 
 
 def test_gemini_paces_the_model_after_a_per_minute_hit(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     slept = _sleeps(monkeypatch)
     clock = [1000.0]
     monkeypatch.setattr(llm_mod.time, "monotonic", lambda: clock[0])
@@ -579,7 +579,7 @@ def test_gemini_paces_the_model_after_a_per_minute_hit(monkeypatch):
 
 
 def test_gemini_per_day_429_moves_to_the_next_model_at_once(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     slept = _sleeps(monkeypatch)
     calls = _capture(monkeypatch, [_quota_429("day", 20, "39599.4s"), _ok_text()])
     notes = []
@@ -592,7 +592,7 @@ def test_gemini_per_day_429_moves_to_the_next_model_at_once(monkeypatch):
 
 
 def test_gemini_day_out_model_is_not_asked_again_this_run(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     _sleeps(monkeypatch)
     _capture(monkeypatch, [_quota_429("day", 20, "39599s"), _ok_text()])
     client = llm_mod.make_client("gemini")
@@ -603,7 +603,7 @@ def test_gemini_day_out_model_is_not_asked_again_this_run(monkeypatch):
 
 
 def test_gemini_every_model_out_for_the_day_names_the_reset(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     _sleeps(monkeypatch)
     calls = _capture(monkeypatch, [_quota_429("day", 20, "39599s")])
     with pytest.raises(llm_mod.QuotaExhaustedError) as exc:
@@ -616,7 +616,7 @@ def test_gemini_every_model_out_for_the_day_names_the_reset(monkeypatch):
 
 
 def test_gemini_day_out_everywhere_fails_fast_on_the_same_client(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     _sleeps(monkeypatch)
     _capture(monkeypatch, [_quota_429("day", 20, "39599s")])
     client = llm_mod.make_client("gemini")
@@ -631,7 +631,7 @@ def test_gemini_day_out_everywhere_fails_fast_on_the_same_client(monkeypatch):
 def test_gemini_unlabeled_429_waits_then_gives_the_model_up(monkeypatch):
     """A bare 429 with no details and no wait: treated as a per-minute
     limit, waited out a few times, then the next model."""
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     slept = _sleeps(monkeypatch)
     bare = _Res(429, {"error": {"message": "Resource has been exhausted (e.g. check quota)."}})
     calls = _capture(monkeypatch, [bare, bare, bare, bare, bare, _ok_text()])
@@ -644,7 +644,7 @@ def test_gemini_unlabeled_429_waits_then_gives_the_model_up(monkeypatch):
 
 
 def test_gemini_long_unlabeled_wait_is_read_as_a_daily_quota(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     slept = _sleeps(monkeypatch)
     calls = _capture(monkeypatch, [_quota_429("day", 20, "72000s", details=False), _ok_text()])
     assert llm_mod.make_client("gemini").generate_json("p", SCHEMA) == {"ok": True}
@@ -655,7 +655,7 @@ def test_gemini_long_unlabeled_wait_is_read_as_a_daily_quota(monkeypatch):
 def test_gemini_cached_answer_from_any_model_needs_no_call(monkeypatch):
     """Resume after a model switch: yesterday's lite answers are found
     before the flash alias is asked (and charged) again."""
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     _sleeps(monkeypatch)
     _capture(monkeypatch, [_quota_429("day", 20, "39599s"), _ok_text({"from": "lite"})])
     llm_mod.make_client("gemini").generate_json("moment 1", SCHEMA)
@@ -681,7 +681,7 @@ def test_the_screenshot_message_alone_is_read_as_a_daily_quota(monkeypatch):
     assert hit.scope == "day" and hit.limit == 20
     assert abs(hit.retry_after - (20 * 3600 + 20 * 60 + 4.321946213)) < 0.001
     assert "resets in about 20 h" in hit.describe()
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     slept = _sleeps(monkeypatch)
     calls = _capture(monkeypatch, [_Res(429, {"error": {"message": AYAAN_429}}), _ok_text()])
     assert llm_mod.make_client("gemini").generate_json("p", SCHEMA) == {"ok": True}
@@ -715,7 +715,7 @@ def test_quota_hit_parser_reads_details_then_words():
 
 
 def test_gemini_network_timeout_does_not_cascade_through_models(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     calls = _capture(monkeypatch, [httpx.ReadTimeout("slow")])
     with pytest.raises(llm_mod.LlmError):
         llm_mod.make_client("gemini").generate_json("p", SCHEMA)
@@ -723,7 +723,7 @@ def test_gemini_network_timeout_does_not_cascade_through_models(monkeypatch):
 
 
 def test_gemini_bad_key_never_tries_another_model(monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_GEMINI_API_KEY", "AIzaTEST")
+    monkeypatch.setenv("capturekit_GEMINI_API_KEY", "AIzaTEST")
     calls = _capture(monkeypatch, [_Res(403, {"error": {"message": "nope"}})])
     with pytest.raises(llm_mod.LlmError) as exc:
         llm_mod.make_client("gemini").generate_json("p", SCHEMA)

@@ -1,5 +1,5 @@
-// publikclip desktop shell. The pipeline is a Python sidecar speaking JSONL
-// on stdout (`publikclip --jsonl ...`); this shell spawns it, forwards every
+// capturekit desktop shell. The pipeline is a Python sidecar speaking JSONL
+// on stdout (`capturekit --jsonl ...`); this shell spawns it, forwards every
 // event to the frontend, and exposes small filesystem/settings commands.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
@@ -15,10 +15,10 @@ mod publik;
 mod update;
 
 pub(crate) fn home_dir() -> PathBuf {
-    if let Ok(custom) = std::env::var("PUBLIKCLIP_HOME") {
+    if let Ok(custom) = std::env::var("capturekit_HOME") {
         return PathBuf::from(custom);
     }
-    dirs_home().join(".publikclip")
+    dirs_home().join(".capturekit")
 }
 
 fn dirs_home() -> PathBuf {
@@ -32,12 +32,12 @@ fn dirs_home() -> PathBuf {
 /// Where uv is allowed to create the pipeline's virtualenv.
 ///
 /// A packaged build must never let uv create `.venv` next to the bundled
-/// pipeline source: on macOS that path is `publikclip.app/Contents/Resources`,
+/// pipeline source: on macOS that path is `capturekit.app/Contents/Resources`,
 /// inside the signed bundle, and the first write there invalidates the code
 /// signature — Gatekeeper then refuses to launch an app that opened fine a
 /// moment earlier. (Windows survives it today only because NSIS installs
 /// under LOCALAPPDATA, which happens to be writable.) Point uv at
-/// PUBLIKCLIP_HOME instead, where every other piece of mutable state already
+/// capturekit_HOME instead, where every other piece of mutable state already
 /// lives, so the bundle stays byte-identical to what was notarized.
 ///
 /// Dev builds keep using the repo's own pipeline/.venv.
@@ -70,7 +70,7 @@ pub(crate) fn quiet_command(program: &str) -> Command {
     // gives us a bare PATH with no uv on it, so tell the sidecar which uv to
     // use instead of letting it look one up by name.
     if !cfg!(debug_assertions) {
-        cmd.env("PUBLIKCLIP_UV", packaged_uv());
+        cmd.env("capturekit_UV", packaged_uv());
     }
     // Python on Windows defaults to the ANSI code page for every text file
     // and pipe. The pipeline names its encodings now (0.2.6), but this keeps
@@ -79,7 +79,7 @@ pub(crate) fn quiet_command(program: &str) -> Command {
     cmd
 }
 
-/// A checkpoint as text. Jobs written by publikclip 0.2.5 and earlier on
+/// A checkpoint as text. Jobs written by capturekit 0.2.5 and earlier on
 /// Windows are in the ANSI code page (Python's default there), so a summary
 /// with an em-dash made `read_to_string` reject the whole stage and the
 /// review bay showed 12 scored cards with no video (Oct 2 2026 report).
@@ -122,14 +122,14 @@ fn pipeline_invocation() -> (String, Vec<String>) {
                 "--directory".to_string(),
                 pipeline_dir.to_string_lossy().to_string(),
                 "run".to_string(),
-                "publikclip".to_string(),
+                "capturekit".to_string(),
             ],
         )
     } else {
         // Packaged: bundled uv + pipeline source under the platform's
         // resource layout — macOS keeps them in the .app's Resources dir,
         // Windows (NSIS) lands them in resources\ next to the exe. The venv
-        // bootstraps into PUBLIKCLIP_HOME on first run (uv handles Python
+        // bootstraps into capturekit_HOME on first run (uv handles Python
         // 3.12 download + deps; the onboarding screen owns expectations).
         let resources = packaged_resources();
         (
@@ -143,7 +143,7 @@ fn pipeline_invocation() -> (String, Vec<String>) {
                 // uv_project_environment() exists to prevent. The bundle ships
                 // a lock that matches the pyproject.toml beside it.
                 "--frozen".to_string(),
-                "publikclip".to_string(),
+                "capturekit".to_string(),
             ],
         )
     }
@@ -253,7 +253,7 @@ mod tests {
 
     #[test]
     fn ansi_checkpoint_from_an_older_windows_build_still_parses() {
-        let dir = std::env::temp_dir().join(format!("publikclip-lossy-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("capturekit-lossy-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("score.json");
         // cp1252 em-dash (0x97) inside a JSON string: not valid UTF-8
@@ -371,7 +371,7 @@ async fn check_ollama() -> Result<Value, String> {
     Ok(json!({"running": true, "models": models}))
 }
 
-/// Run `publikclip <args...>` and parse the last JSON line — the contract
+/// Run `capturekit <args...>` and parse the last JSON line — the contract
 /// edit_tool/ig_tool/the audio_* commands all rely on (progress lines, if
 /// any, may precede the final payload).
 fn run_cli_json(args: Vec<String>) -> Result<Value, String> {
@@ -387,7 +387,7 @@ fn run_cli_json(args: Vec<String>) -> Result<Value, String> {
     match line.and_then(|l| serde_json::from_str::<Value>(l).ok()) {
         Some(v) => Ok(v),
         None => Err(format!(
-            "publikclip produced no JSON: {}",
+            "capturekit produced no JSON: {}",
             String::from_utf8_lossy(&out.stderr).chars().take(400).collect::<String>()
         )),
     }
@@ -496,8 +496,8 @@ fn audio_keys_status() -> Result<Value, String> {
     }))
 }
 
-/// Local music/sfx library — import/list/remove, all shelling to `publikclip
-/// audio ...` like edit_tool shells to `publikclip edit ...`.
+/// Local music/sfx library — import/list/remove, all shelling to `capturekit
+/// audio ...` like edit_tool shells to `capturekit edit ...`.
 #[tauri::command]
 async fn audio_import(paths: Vec<String>, kind: String) -> Result<Value, String> {
     let mut args = vec!["audio".to_string(), "import".to_string()];
@@ -612,7 +612,7 @@ async fn ig_connect(app_id: String, app_secret: String) -> Result<String, String
     }
 }
 
-/// One-shot `publikclip ig <args...>` call returning the CLI's JSON line
+/// One-shot `capturekit ig <args...>` call returning the CLI's JSON line
 /// (sync / overview / link / unlink / reject — same contract as edit_tool).
 #[tauri::command]
 async fn ig_tool(args: Vec<String>) -> Result<Value, String> {
@@ -628,7 +628,7 @@ fn export_clip(path: String, title: Option<String>) -> Result<String, String> {
         return Err("clip file missing".into());
     }
     let downloads = dirs_home().join("Downloads");
-    let stem = title.unwrap_or_else(|| "publikclip".into());
+    let stem = title.unwrap_or_else(|| "capturekit".into());
     let safe: String = stem
         .chars()
         .map(|c| if c.is_alphanumeric() || c == ' ' || c == '-' { c } else { '_' })
@@ -691,5 +691,5 @@ fn main() {
             Ok(())
         })
         .run(tauri::generate_context!())
-        .expect("error while running publikclip");
+        .expect("error while running capturekit");
 }

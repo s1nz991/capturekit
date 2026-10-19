@@ -1,7 +1,7 @@
 # bugfix-lab controlled-environment repro (Windows) for cluster:
-# publikclip-pipeline-exit-speakers-model
+# capturekit-pipeline-exit-speakers-model
 #
-# Observes: on the pinned commit (matches lib/guides/publikclip.ts's
+# Observes: on the pinned commit (matches lib/guides/capturekit.ts's
 # sourceCommit and repo main/win-port), with an already-cached-but-corrupted
 # CAM++ speaker-embedding checkpoint (models/specs.py registers CAMPPLUS
 # with sha256=None, so models/registry.py's ensure() never validates a
@@ -27,7 +27,7 @@ if ($ffmpegOnPath) { Write-Host "ffmpeg found at: $($ffmpegOnPath.Source)" } els
 #     cli._stages() is narrowed to ingest+asr+diarize and this CI run only
 #     drives the poison case -- the mac-local oracle already proved the
 #     valid/negative-control case on Sep 21 2026, see bugfix-lab/work/
-#     publikclip-pipeline-exit-speakers-model/RESULT.json) ---
+#     capturekit-pipeline-exit-speakers-model/RESULT.json) ---
 Push-Location pipeline
 uv venv --python 3.12 .venv-oracle
 uv pip install --python .venv-oracle\Scripts\python.exe -e . --no-deps
@@ -56,15 +56,15 @@ if (-not (Test-Path $fixture)) {
 # --- driver: the real CLI resume path, unmodified pipeline source, through
 #     the real DiarizeStage.run() -> registry.ensure() -> campplus.load_model()
 #     -> torch.load() call with a pre-poisoned CAM++ checkpoint file ---
-$env:PUBLIKCLIP_PIPELINE_DIR = (Resolve-Path pipeline).Path
+$env:capturekit_PIPELINE_DIR = (Resolve-Path pipeline).Path
 $env:ORACLE_FIXTURE_MEDIA = $fixture
-$homeDir = Join-Path $env:RUNNER_TEMP "publikclip_home"
+$homeDir = Join-Path $env:RUNNER_TEMP "capturekit_home"
 New-Item -ItemType Directory -Force -Path $homeDir | Out-Null
-$env:PUBLIKCLIP_HOME = $homeDir
+$env:capturekit_HOME = $homeDir
 
 $rawLog = Join-Path $env:RUNNER_TEMP "driver_raw.json"
 & "pipeline\.venv-oracle\Scripts\python.exe" `
-    "scripts\bugfix-lab\publikclip-pipeline-exit-speakers-model_driver.py" `
+    "scripts\bugfix-lab\capturekit-pipeline-exit-speakers-model_driver.py" `
     1> $rawLog 2> "$env:RUNNER_TEMP\driver_stderr.txt"
 $harnessCode = $LASTEXITCODE
 

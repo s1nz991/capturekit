@@ -17,8 +17,8 @@ import wave
 import numpy as np
 import pytest
 
-from publikclip_pipeline.asr import stage as asr_stage
-from publikclip_pipeline.render import ffmpeg_bin
+from capturekit_pipeline.asr import stage as asr_stage
+from capturekit_pipeline.render import ffmpeg_bin
 
 FINDER_PATH = "/usr/bin:/bin:/usr/sbin:/sbin"
 

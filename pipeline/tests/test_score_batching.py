@@ -10,16 +10,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from publikclip_pipeline import config
-from publikclip_pipeline.jobs.queue import StageError
-from publikclip_pipeline.scoring import llm as llm_mod
-from publikclip_pipeline.scoring import rubric
-from publikclip_pipeline.scoring.stage import ScoreStage
+from capturekit_pipeline import config
+from capturekit_pipeline.jobs.queue import StageError
+from capturekit_pipeline.scoring import llm as llm_mod
+from capturekit_pipeline.scoring import rubric
+from capturekit_pipeline.scoring.stage import ScoreStage
 
 
 @pytest.fixture(autouse=True)
 def isolated_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("PUBLIKCLIP_HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("capturekit_HOME", str(tmp_path / "home"))
     yield
 
 
@@ -90,7 +90,7 @@ def _ctx(tmp_path, n_candidates):
 def _run(monkeypatch, tmp_path, client, n=12):
     monkeypatch.setattr(llm_mod, "make_client", lambda mode, notify=None: client)
     # no frames to extract in a test: the visual pass gets no images
-    from publikclip_pipeline.scoring import frames as frames_mod
+    from capturekit_pipeline.scoring import frames as frames_mod
     monkeypatch.setattr(frames_mod, "extract_frames", lambda *a, **k: [])
     ctx = _ctx(tmp_path, n)
     return ScoreStage().run(ctx), client, ctx
@@ -159,7 +159,7 @@ def test_short_moments_never_cost_a_call(monkeypatch, tmp_path):
     monkeypatch.setattr(llm_mod, "make_client", lambda mode, notify=None: client)
     ctx = _ctx(tmp_path, 3)
     ctx.prior["candidates"]["candidates"][1] = {"start": 1000.0, "end": 1001.0, "curve_score": 0.1, "channel_scores": {}}
-    from publikclip_pipeline.scoring import frames as frames_mod
+    from capturekit_pipeline.scoring import frames as frames_mod
     monkeypatch.setattr(frames_mod, "extract_frames", lambda *a, **k: [])
     data = ScoreStage().run(ctx)
     batch = [c for c in client.calls if c["schema"] is rubric.T1_BATCH_SCHEMA]

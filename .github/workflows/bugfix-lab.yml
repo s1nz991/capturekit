@@ -16,7 +16,7 @@ on:
       script:
         description: "Path under scripts/bugfix-lab/ of the .ps1 oracle body to run"
         required: true
-        default: publikclip-windows-build-fails-then-launch-fails.ps1
+        default: capturekit-windows-build-fails-then-launch-fails.ps1
 
 jobs:
   windows-oracle:

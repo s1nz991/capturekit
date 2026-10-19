@@ -1,6 +1,6 @@
 """Model weight registry + downloader.
 
-All weights land in PUBLIKCLIP_HOME/models/<name>. Downloads resume (Range)
+All weights land in capturekit_HOME/models/<name>. Downloads resume (Range)
 and verify sha256 when one is pinned. The registry grows per milestone —
 M1 adds the audio models, M3 the vision ONNX models. Entries with a
 sha256 of None are verified by size-only until first release pinning.

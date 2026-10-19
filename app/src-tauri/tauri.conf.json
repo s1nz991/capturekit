@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "publikclip",
+  "productName": "capturekit",
   "version": "0.2.6",
-  "identifier": "com.publikhq.publikclip",
+  "identifier": "com.publikhq.capturekit",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1430",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "publikclip",
+        "title": "capturekit",
         "width": 1200,
         "height": 800,
         "minWidth": 900,
@@ -24,7 +24,7 @@
       "assetProtocol": {
         "enable": true,
         "scope": [
-          "$HOME/.publikclip/**"
+          "$HOME/.capturekit/**"
         ]
       }
     }

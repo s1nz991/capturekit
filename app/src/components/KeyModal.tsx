@@ -179,7 +179,7 @@ export default function KeyModal({ onClose }: Props) {
         <p className="audit-label" style={{ marginTop: 22 }}>YOUR OWN GEMINI KEY</p>
         <p className="ig-intro">
           Prefer your own Google key? Gemini scores at the same quality; your key lives
-          in <span className="mono">~/.publikclip/secrets.json</span>, chmod 600, and
+          in <span className="mono">~/.capturekit/secrets.json</span>, chmod 600, and
           never goes anywhere but Google.{' '}
           {hasKey && <strong>A key is currently saved{saved ? ' — updated ✓' : ''}.</strong>}
         </p>

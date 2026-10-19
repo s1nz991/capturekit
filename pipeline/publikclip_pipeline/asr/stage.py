@@ -80,7 +80,7 @@ def plan_models(available: int | None, forced: str | None = None) -> tuple[list[
     """Which speech models to try, in order, and a one-line reason when the
     plan does not start at the most accurate one.
 
-    `forced` (PUBLIKCLIP_ASR_MODEL) pins one model for support cases. With
+    `forced` (capturekit_ASR_MODEL) pins one model for support cases. With
     no memory reading the whole ladder is tried and a failed allocation
     moves down a step; with one, models that cannot fit are skipped up
     front so the user is not made to wait for a 1.6 GB download that would
@@ -88,8 +88,8 @@ def plan_models(available: int | None, forced: str | None = None) -> tuple[list[
     if forced:
         for spec in SPEECH_MODELS:
             if spec.name == forced:
-                return [spec], f"PUBLIKCLIP_ASR_MODEL={forced}"
-        return [SpeechModel(forced, download_mb=0, needs_gib=0.0, batch_size=4)], f"PUBLIKCLIP_ASR_MODEL={forced}"
+                return [spec], f"capturekit_ASR_MODEL={forced}"
+        return [SpeechModel(forced, download_mb=0, needs_gib=0.0, batch_size=4)], f"capturekit_ASR_MODEL={forced}"
     ladder = list(SPEECH_MODELS)
     if available is None:
         return ladder, None
@@ -136,7 +136,7 @@ def load_audio(path: Path):
 
 def _decode_with_ffmpeg(path: Path):
     """Same command line as whisperx.load_audio, same output — but the binary
-    is the one publikclip resolved, by absolute path, not whatever PATH has."""
+    is the one capturekit resolved, by absolute path, not whatever PATH has."""
     import numpy as np
 
     from ..render import ffmpeg_bin
@@ -149,7 +149,7 @@ def _decode_with_ffmpeg(path: Path):
         out = subprocess.run(cmd, capture_output=True, check=True).stdout
     except FileNotFoundError as err:
         raise StageError(
-            "No ffmpeg found to decode the audio — re-run ingest so publikclip can fetch one."
+            "No ffmpeg found to decode the audio — re-run ingest so capturekit can fetch one."
         ) from err
     except subprocess.CalledProcessError as err:
         tail = err.stderr.decode("utf-8", errors="replace")[-2000:]
@@ -158,7 +158,7 @@ def _decode_with_ffmpeg(path: Path):
 
 
 def _point_caches_at_home() -> None:
-    """All model caches live under PUBLIKCLIP_HOME so 'delete the app data
+    """All model caches live under capturekit_HOME so 'delete the app data
     dir' is a complete uninstall."""
     hf_home = config.models_dir() / "hf"
     hf_home.mkdir(parents=True, exist_ok=True)
@@ -187,7 +187,7 @@ class AsrStage(Stage):
         duration = float(len(audio)) / SAMPLE_RATE
 
         available = sysinfo.available_memory_bytes()
-        plan, reason = plan_models(available, os.environ.get("PUBLIKCLIP_ASR_MODEL"))
+        plan, reason = plan_models(available, os.environ.get("capturekit_ASR_MODEL"))
         if reason:
             ctx.emit(-1, reason)
 
@@ -283,7 +283,7 @@ class AsrStage(Stage):
         word_count = sum(len(s["words"]) for s in segments)
         if word_count == 0:
             raise StageError(
-                "No speech was found in this video. publikclip needs dialogue to find moments."
+                "No speech was found in this video. capturekit needs dialogue to find moments."
             )
 
         total = transcribe_secs + align_secs

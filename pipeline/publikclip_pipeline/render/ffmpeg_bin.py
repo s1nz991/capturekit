@@ -2,7 +2,7 @@
 
 Caption burning needs an ffmpeg built with libass, and (as this very
 machine demonstrates) Homebrew's slimmed `ffmpeg` formula ships without it.
-Resolution order: PUBLIKCLIP_FFMPEG env → bundled sidecar binary (packaged
+Resolution order: capturekit_FFMPEG env → bundled sidecar binary (packaged
 app) → Homebrew ffmpeg-full keg → PATH. The first candidate that actually
 has the `subtitles` filter wins; if none do, the plain PATH binary is
 returned with `has_subtitles=False` so the caller can degrade (render
@@ -28,12 +28,12 @@ _KEG_CANDIDATES = [
 
 # Static macOS builds with libass (ffmpeg.martin-riedl.de). Used only when
 # no capable ffmpeg exists on the machine — downloaded once into
-# PUBLIKCLIP_HOME/bin so end users never touch Homebrew.
+# capturekit_HOME/bin so end users never touch Homebrew.
 _STATIC_BASE = "https://ffmpeg.martin-riedl.de/redirect/latest/macos/{arch}/release/{tool}.zip"
 
 # Static Windows build with libass: BtbN's GPL build ships ffmpeg.exe and
 # ffprobe.exe (with the subtitles filter) in one zip under a stable
-# latest-release URL. ~80 MB once, into PUBLIKCLIP_HOME/bin.
+# latest-release URL. ~80 MB once, into capturekit_HOME/bin.
 _STATIC_WINDOWS = (
     "https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/"
     "ffmpeg-master-latest-win64-gpl.zip"
@@ -57,11 +57,11 @@ def _has_subtitles_filter(binary: str) -> bool:
 def resolve() -> tuple[str, bool]:
     """(ffmpeg_path, has_subtitles)."""
     candidates: list[str] = []
-    env = os.environ.get("PUBLIKCLIP_FFMPEG")
+    env = os.environ.get("capturekit_FFMPEG")
     if env:
         candidates.append(env)
     candidates.append(str(config.bin_dir() / f"ffmpeg{_EXE}"))  # our downloaded static
-    bundled = os.environ.get("PUBLIKCLIP_BUNDLED_FFMPEG")  # set by the app shell
+    bundled = os.environ.get("capturekit_BUNDLED_FFMPEG")  # set by the app shell
     if bundled:
         candidates.append(bundled)
     if platform.system() == "Darwin":
@@ -87,7 +87,7 @@ def _export_to_path(binary: str) -> str:
 
     Third-party code that shells out to a bare ``ffmpeg``/``ffprobe``
     (whisperx's audio loader, librosa's audioread fallback for mp3 imports,
-    …) then finds the same binary publikclip picked. Under the packaged
+    …) then finds the same binary capturekit picked. Under the packaged
     app's Finder PATH (/usr/bin:/bin:/usr/sbin:/sbin) it found nothing and
     died with FileNotFoundError, even though ingest had just used a
     perfectly good ffmpeg one resolver call earlier. Idempotent."""
@@ -193,7 +193,7 @@ def _ensure_capable_windows(progress) -> bool:
 
 def ensure_capable(progress=None) -> bool:
     """If no libass ffmpeg exists anywhere, download a static build once
-    into PUBLIKCLIP_HOME/bin (macOS arm64/x86_64, Windows x64), then
+    into capturekit_HOME/bin (macOS arm64/x86_64, Windows x64), then
     re-resolve. Returns whether caption burning is available afterwards."""
     if supports_captions():
         return True

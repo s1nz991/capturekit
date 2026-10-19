@@ -1,8 +1,8 @@
-# publikclip
+# capturekit
 
 **Long video in. Scored vertical clips out. Everything runs on your machine.**
 
-publikclip is an open-source (AGPL-3.0) desktop app that takes a YouTube URL or a
+capturekit is an open-source (AGPL-3.0) desktop app that takes a YouTube URL or a
 horizontal video file and produces vertical 9:16 clips with:
 
 - **Smart camera** — active-speaker-tracked crop paths, smoothed motion, hard cuts
@@ -31,7 +31,7 @@ Working end to end: hour-long podcast in, rendered/captioned/scored 9:16 clips
 out, validated on real footage. The Instagram feedback loop ships in-app
 (sync, clip↔Reel matching, snapshot history, automatic score calibration).
 Builds are currently unsigned — install from source below, or follow the
-guided install at [publikhq.com/publikclip](https://publikhq.com/publikclip).
+guided install at [publikhq.com/capturekit](https://publikhq.com/capturekit).
 
 Runs on macOS (Apple silicon) and Windows 10/11 x64. The Windows path is
 validated on every push by the `windows` workflow: env resolve, full test
@@ -41,7 +41,7 @@ clean VM.
 ## Music & SFX
 
 Every clip gets its own music/sfx track, backed by a local library at
-`~/.publikclip/audio/` (files copied in, plus an index of tags/bpm/licence).
+`~/.capturekit/audio/` (files copied in, plus an index of tags/bpm/licence).
 The library starts empty — fill it from your own files, or pull
 Creative-Commons tracks from Freesound/Jamendo straight from the app.
 
@@ -82,12 +82,12 @@ You need four tools: git, [Node](https://nodejs.org), [Rust](https://rustup.rs),
 and [uv](https://docs.astral.sh/uv/). Then:
 
 ```sh
-git clone https://github.com/Blueturboguy07/publikclip.git
-cd publikclip/app
+git clone https://github.com/Blueturboguy07/capturekit.git
+cd capturekit/app
 npm install
 npx tauri build --bundles app
-ditto src-tauri/target/release/bundle/macos/publikclip.app /Applications/publikclip.app
-open /Applications/publikclip.app
+ditto src-tauri/target/release/bundle/macos/capturekit.app /Applications/capturekit.app
+open /Applications/capturekit.app
 ```
 
 The app downloads its speech/audio models (~4–5 GB) on first run with a
@@ -104,8 +104,8 @@ with C++** build tools, [Node](https://nodejs.org), git, and
 Then, in PowerShell:
 
 ```powershell
-git clone https://github.com/Blueturboguy07/publikclip.git
-cd publikclip\app
+git clone https://github.com/Blueturboguy07/capturekit.git
+cd capturekit\app
 npm.cmd install
 node_modules\.bin\tauri.cmd build --bundles nsis
 # run the installer it produces:
@@ -120,12 +120,12 @@ bar, and a caption-capable static ffmpeg is fetched automatically.
 ```sh
 # pipeline
 cd pipeline && uv sync --group dev --group pipeline && uv run pytest
-uv run publikclip run "https://www.youtube.com/watch?v=..."
+uv run capturekit run "https://www.youtube.com/watch?v=..."
 
 # pick the brain per run: --llm publik (default) | gemini | ollama
 # publik API from a terminal, no GUI: PUBLIK_API_KEY=pk_live_... (optional
 # PUBLIK_API_BASE_URL, default https://publikhq.com/api/v1); own key:
-# PUBLIKCLIP_GEMINI_API_KEY=AIza...
+# capturekit_GEMINI_API_KEY=AIza...
 
 # app
 cd app && npm install && npm run tauri dev

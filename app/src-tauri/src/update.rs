@@ -1,5 +1,5 @@
-// "A newer publikclip is out": one GET to GitHub's latest-release endpoint on
-// launch, compared with the version compiled into this binary. publikclip has
+// "A newer capturekit is out": one GET to GitHub's latest-release endpoint on
+// launch, compared with the version compiled into this binary. capturekit has
 // no self-updater, so without this a person on an old build never learns a
 // fix shipped (the 0.2.2 builds kept showing a stale "$0.25 free" line for
 // hours after the server had changed, 2026-09-28). Offline or rate-limited,
@@ -8,8 +8,8 @@ use serde_json::{json, Value};
 
 use crate::publik::curl_request;
 
-const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/Blueturboguy07/publikclip/releases/latest";
-const RELEASES_PAGE: &str = "https://github.com/Blueturboguy07/publikclip/releases/latest";
+const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/Blueturboguy07/capturekit/releases/latest";
+const RELEASES_PAGE: &str = "https://github.com/Blueturboguy07/capturekit/releases/latest";
 
 /// "v0.2.3" or "0.2.3" -> (0, 2, 3). Anything else is None, so a tag that
 /// is not a version can never look newer.

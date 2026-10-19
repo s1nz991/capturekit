@@ -99,7 +99,7 @@ export interface PublikStatus {
   disclosure: { version?: number; cost?: string; data_path?: string } | null
   /** publik_refresh only: true when the gateway answered GET /wallet */
   refreshed?: boolean
-  /** ~/.publikclip/publik-status.json, rewritten by the pipeline after every
+  /** ~/.capturekit/publik-status.json, rewritten by the pipeline after every
    *  call and by publik_refresh from GET /wallet */
   status: {
     balance_micros?: number | null

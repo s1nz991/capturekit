@@ -20,8 +20,8 @@ GIB = 1024**3
 
 def available_memory_bytes() -> int | None:
     """Bytes a new allocation could get without swapping, or None when the
-    host cannot say. Honors PUBLIKCLIP_MEM_AVAILABLE_MB for tests/support."""
-    override = os.environ.get("PUBLIKCLIP_MEM_AVAILABLE_MB")
+    host cannot say. Honors capturekit_MEM_AVAILABLE_MB for tests/support."""
+    override = os.environ.get("capturekit_MEM_AVAILABLE_MB")
     if override:
         try:
             return int(float(override) * 1024 * 1024)

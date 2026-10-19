@@ -70,7 +70,7 @@ export default function Onboarding({ onDone }: Props) {
       <div className="grain" />
       {step === 0 && (
         <section className="ob-step" key="s0">
-          <p className="ob-kicker">publikclip</p>
+          <p className="ob-kicker">capturekit</p>
           <h1 className="ob-title">
             THE CLIPPER
             <br />
@@ -128,7 +128,7 @@ export default function Onboarding({ onDone }: Props) {
               <h3>Your own Gemini key</h3>
               <p>
                 Prefer your own Google key? Paste it here (aistudio.google.com);
-                publikclip then talks to Google directly.
+                capturekit then talks to Google directly.
               </p>
               <p className="ob-required">{LINK_STILL_REQUIRED}</p>
               <div className="ob-key-row">
@@ -183,7 +183,7 @@ export default function Onboarding({ onDone }: Props) {
           <h2 className="ob-h2">First run downloads the models</h2>
           <p className="ob-body">
             About <span className="mono">2.5 GB</span> of open speech and audio models,
-            fetched once into <span className="mono">~/.publikclip</span>. An hour-long
+            fetched once into <span className="mono">~/.capturekit</span>. An hour-long
             podcast then takes a while on-device — the progress bar never lies to you,
             and every stage checkpoints, so you can quit and resume anytime.
           </p>

@@ -1,8 +1,8 @@
-"""publikclip CLI.
+"""capturekit CLI.
 
 Doubles as the desktop app's sidecar: with --jsonl every progress event and
 the final result are emitted as one JSON object per stdout line, so the
-Tauri shell just spawns `publikclip --jsonl run <source>` and streams.
+Tauri shell just spawns `capturekit --jsonl run <source>` and streams.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from .jobs import queue
 
 def _stages() -> list[queue.Stage]:
     # Grows per milestone: ingest → asr → diarize → events → candidates →
-    # score → camera → render. Stage imports are deferred so `publikclip
+    # score → camera → render. Stage imports are deferred so `capturekit
     # jobs` doesn't pay the torch import tax.
     from .asr.stage import AsrStage
     from .camera.stage import CameraStage
@@ -70,14 +70,14 @@ def _uv_binary() -> str:
     /usr/bin:/bin:/usr/sbin:/sbin on macOS — so a uv installed anywhere a
     terminal would find it is invisible here, and looking it up by name is
     exactly how a packaged app died on first run with `No such file or
-    directory: 'uv'`. The shell passes the uv it bundles as PUBLIKCLIP_UV;
+    directory: 'uv'`. The shell passes the uv it bundles as capturekit_UV;
     `uv run` also exports its own path as UV; PATH is the last resort (dev
     shells, CI).
     """
     import os
     import shutil
 
-    for var in ("PUBLIKCLIP_UV", "UV"):
+    for var in ("capturekit_UV", "UV"):
         candidate = os.environ.get(var)
         if candidate and os.path.exists(candidate):
             return candidate
@@ -132,7 +132,7 @@ def _ensure_pipeline_deps(jsonl: bool, emit) -> tuple[bool, str | None]:
     torch-via-whisperx, opencv, speechbrain, ...).
 
     That group is deliberately NOT one of uv's default-groups (see
-    pyproject.toml) — a bare `uv run publikclip ...` (exactly what the
+    pyproject.toml) — a bare `uv run capturekit ...` (exactly what the
     desktop app's sidecar spawns) would otherwise try to sync it, and every
     dependency in the whole graph, before `main()` gets to run at all: if
     that opaque pre-launch sync fails (no network, a blocked host, a first
@@ -263,7 +263,7 @@ def _execute(job: queue.Job, jsonl: bool) -> int:
         message = f"Couldn't install pipeline dependencies (one-time setup): {err}"
         # run_stages() never ran, so nothing else will move this job off
         # "pending" -- record the failure here or the row stays pending
-        # forever and `publikclip jobs` shows it as still queued.
+        # forever and `capturekit jobs` shows it as still queued.
         queue.set_job_status(job.id, "failed", message)
         _emit_result(jsonl, {"ok": False, "job_id": job.id, "error": message})
         return 1
@@ -427,7 +427,7 @@ def cmd_ig(args: argparse.Namespace) -> int:
     # Human/legacy commands.
     conn = instagram.load_connection()
     if args.ig_cmd in ("media", "pull") and conn is None:
-        print("Not connected. Run: publikclip ig connect --app-id ... --app-secret ...", file=sys.stderr)
+        print("Not connected. Run: capturekit ig connect --app-id ... --app-secret ...", file=sys.stderr)
         return 2
     if conn is not None:
         conn = instagram.refresh_if_needed(conn)
@@ -442,7 +442,7 @@ def cmd_ig(args: argparse.Namespace) -> int:
     if args.ig_cmd == "pull":
         rows = calibration.tracked()
         if not rows:
-            print("No linked clips yet. Post an exported clip, then: publikclip ig link ...")
+            print("No linked clips yet. Post an exported clip, then: capturekit ig link ...")
             return 0
         for row in rows:
             if not row["ig_media_id"]:
@@ -575,7 +575,7 @@ def cmd_audio(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="publikclip")
+    parser = argparse.ArgumentParser(prog="capturekit")
     parser.add_argument("--jsonl", action="store_true", help="machine-readable progress on stdout")
     sub = parser.add_subparsers(dest="cmd", required=True)
 

@@ -126,7 +126,7 @@ class EventsStage(Stage):
             # / zipfile.BadZipFile depending on the truncation point, none
             # of which is a StageError either. Unwrapped, that crashed the
             # whole Python sidecar with no final result event (bugfix-lab
-            # cluster publikclip-pipeline-exit-listen-panns) — the UI then
+            # cluster capturekit-pipeline-exit-listen-panns) — the UI then
             # showed a generic "pipeline exited unexpectedly" banner and
             # every "Resume" just re-ran this stage into the same crash,
             # since the events checkpoint is only written after a

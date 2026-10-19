@@ -1,8 +1,8 @@
-# bugfix-lab oracle body for cluster: publikclip-windows-build-fails-then-launch-fails
+# bugfix-lab oracle body for cluster: capturekit-windows-build-fails-then-launch-fails
 #
-# Runs the publikclip Windows guide's steps 4 (install uv), 5-8 (clone/pin/deps),
+# Runs the capturekit Windows guide's steps 4 (install uv), 5-8 (clone/pin/deps),
 # 9 (build the installer) and 10 (run the installer) EXACTLY as rendered from
-# lib/guides/publikclip.ts (guide version 7, sourceCommit
+# lib/guides/capturekit.ts (guide version 7, sourceCommit
 # a53a359b985b1d2d666266062936cc186f02340b), in ONE persistent PowerShell
 # session -- matching iris-windows's ShellSession contract (session persists
 # across guide steps; see src/services/autopilot/shell.ts). Steps 1-3 (Open
@@ -29,18 +29,18 @@ Note '--- step 4: Install uv (winget, same as the guide) ---'
 winget install --id astral-sh.uv -e --accept-source-agreements --accept-package-agreements
 Note "winget exit code: $LASTEXITCODE"
 
-Note '--- step 5-6: clone publikclip to this PC ---'
+Note '--- step 5-6: clone capturekit to this PC ---'
 Set-Location $HOME
-if (-not (Test-Path publikclip/.git)) {
-  git clone https://github.com/Blueturboguy07/publikclip.git
+if (-not (Test-Path capturekit/.git)) {
+  git clone https://github.com/Blueturboguy07/capturekit.git
 }
-Set-Location (Join-Path $HOME 'publikclip')
+Set-Location (Join-Path $HOME 'capturekit')
 
 Note '--- step 7: pin to the reviewed commit ---'
 git checkout a53a359b985b1d2d666266062936cc186f02340b 2>&1 | ForEach-Object { Note $_ }
 
 Note '--- step 8: install the interface packages ---'
-Set-Location (Join-Path $HOME 'publikclip/app')
+Set-Location (Join-Path $HOME 'capturekit/app')
 npm.cmd install 2>&1 | Tee-Object -Variable npmOut | ForEach-Object { Note $_ }
 Note "npm install exit code: $LASTEXITCODE"
 
@@ -68,8 +68,8 @@ if (-not $setup) {
   Note "installer exit code: $($installer.ExitCode)"
 }
 
-Note '--- step 11: open publikclip (only meaningful if step 10 actually installed something) ---'
-$exePath = "$env:LOCALAPPDATA\publikclip\publikclip-app.exe"
+Note '--- step 11: open capturekit (only meaningful if step 10 actually installed something) ---'
+$exePath = "$env:LOCALAPPDATA\capturekit\capturekit-app.exe"
 if (-not (Test-Path $exePath)) {
   $present = $true
   Note "PRESENCE SIGNAL: launch target missing ($exePath does not exist) -- matches reporter's Start-Process 'cannot find the file specified'."

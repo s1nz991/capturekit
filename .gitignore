@@ -16,7 +16,7 @@ app/src-tauri/target/
 app/dist/
 
 # Local data — never commit media, models, or job artifacts
-.publikclip/
+.capturekit/
 *.mp4
 *.wav
 *.mkv
